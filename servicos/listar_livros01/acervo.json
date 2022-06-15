@@ -1,0 +1,34 @@
+{
+    "livros_acervo_biblioteca": [
+        {
+            "id": 1,
+            "titulo": "Livro 1",
+            "autor": "Autor 1",
+            "disponibilidade": false
+        },
+        {
+            "id": 2,
+            "titulo": "Livro 2",
+            "autor": "Autor 2",
+            "disponibilidade": false
+        },
+        {
+            "id": 3,
+            "titulo": "Livro 3",
+            "autor": "Autor 3",
+            "disponibilidade": true
+        },
+        {
+            "id": 4,
+            "titulo": "Livro 4",
+            "autor": "Autor 4",
+            "disponibilidade": true
+        },
+        {
+            "id": 5,
+            "titulo": "Livro 5",
+            "autor": "Autor 5",
+            "disponibilidade": true
+        }
+    ]
+}
