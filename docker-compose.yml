@@ -24,19 +24,6 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  venda:
-    image: venda
-    container_name: venda
-    build: .  
-    depends_on:
-      - kafka
-    ports:
-      - "5001:5000"
-    hostname: "venda"
-    volumes:
-      - "./servicos/venda:/workdir"
-    command: python3 /workdir/servico.py
-
   listar_livros01:
     image: listar_livros01
     container_name: listar_livros01
@@ -46,28 +33,6 @@ services:
     hostname: "listar_livros01"
     volumes:
       - "./servicos/listar_livros01:/workdir"
-    command: python3 /workdir/servico.py
-
-  pagamento:
-    image: pagamento
-    container_name: pagamento
-    build: .
-    depends_on:
-      - kafka
-    hostname: "pagamento"
-    volumes:
-      - "./servicos/pagamento:/workdir"
-    command: python3 /workdir/servico.py
-
-  remessa:
-    image: remessa
-    container_name: remessa
-    build: .
-    depends_on:
-      - kafka
-    hostname: "remessa"
-    volumes:
-      - "./servicos/remessa:/workdir"
     command: python3 /workdir/servico.py
 
   simular_reservas02:
@@ -81,5 +46,27 @@ services:
     hostname: "simular_reservas02"
     volumes:
       - "./servicos/simular_reservas02:/workdir"
-    command: python3 /workdir/servico.py    
+    command: python3 /workdir/servico.py 
+
+  atualizar_status03:
+    image: atualizar_status03
+    container_name: atualizar_status03
+    build: .
+    depends_on:
+      - kafka
+    hostname: "atualizar_status03"
+    volumes:
+      - "./servicos/atualizar_status03:/workdir"
+    command: python3 /workdir/servico.py
+
+  sugestao_livro04:
+    image: sugestao_livro04
+    container_name: sugestao_livro04
+    build: .
+    depends_on:
+      - kafka
+    hostname: "sugestao_livro04"
+    volumes:
+      - "./servicos/sugestao_livro04:/workdir"
+    command: python3 /workdir/servico.py
 

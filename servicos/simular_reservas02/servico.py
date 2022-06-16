@@ -1,5 +1,6 @@
 #SERVICO 02 - SIMULAR RESERVAS
 
+from ast import If
 from flask_apscheduler import APScheduler
 from flask import Flask, jsonify
 from kafka import KafkaClient, KafkaProducer, KafkaConsumer, TopicPartition
@@ -12,6 +13,8 @@ import json
 servico = Flask(__name__)
 
 PROCESSO = "listar_livros"
+CONFIRMACAO_RESERVA = "confirmar_reserva"
+SUGESTAO_LIVROS = "sugerir_livros"
 
 def iniciar():
     cliente = KafkaClient(
@@ -48,31 +51,41 @@ def efetuar_reserva(informacoes_da_remessa, id_livro):
     mensagem = "Processando"
     index = 0
     for acervo in informacoes_da_remessa:
-            if acervo["id"] == id_livro:
-                autor = acervo["autor"]
-                if acervo["disponibilidade"] == True:
-                    print(f"Autor: {autor}")
-                    print(f"Pode enviar email com a reserva.")
-                    
-                    return jsonify("Pode enviar email com a reserva.")
-                    break
-                else:
-                    print(f"Autor: {autor}")
-                    print(f"Manda para o servico 4")
-                    
-                    return "Manda para o servico 4"
-                    break
-            else:
-                return jsonify(f"Não existe livro com esse id: {id_livro}")
+        if acervo["id"] == id_livro:
+            identificador_livro = []
+            autor = acervo["autor"]
+            titulo = acervo["titulo"]
+            disponibilidade = acervo["disponibilidade"] 
             index += 1
-
-def validar_desbloqueio(id_pedido, informacoes_da_remessa):
-    # simula um gasto de tempo de processamento
-    sleep(random.randint(1, 6))
-
-    desbloqueado, mensagem = True, "desbloqueio realizado com sucesso"
-    return desbloqueado, mensagem
-
+            if acervo["disponibilidade"] == True:
+                email = (f"Email de confirmação de reserva enviado, caso o livro esteja dísponivel sua reserva será confirmada.")
+                
+                try:
+                    produtor = KafkaProducer(
+                        bootstrap_servers=["kafka:29092"],
+                        api_version=(0, 10, 1)
+                    )
+                    produtor.send(topic=CONFIRMACAO_RESERVA, value=json.dumps(
+                        id_livro).encode("utf-8"))
+                    
+                except KafkaError as erro:
+                    resultado = f"erro: {erro}"
+                
+                return jsonify({"Dados recebidos": {"Id Livro":id_livro, "Autor": autor, "Disponibilidade": disponibilidade}, "Resposta": email})
+            else:
+                email = ("Livro indisponível no momento")
+                
+                try:
+                    produtor = KafkaProducer(
+                        bootstrap_servers=["kafka:29092"],
+                        api_version=(0, 10, 1)
+                    )
+                    produtor.send(topic=SUGESTAO_LIVROS, value=json.dumps(
+                        "sugerir").encode("utf-8"))
+                    
+                except KafkaError as erro:
+                    resultado = f"erro: {erro}"
+                return jsonify({"Resposta": email})
 if __name__ == "__main__":
     iniciar()
     

@@ -17,11 +17,11 @@ painel_de_acervo.assign([particao])
 painel_de_acervo.seek_to_beginning(particao)
 offset = 0
 while True:
-    print("esperando pedidos de separacao...")
+    print("Carregando lista de livros...")
 
     for pedido in painel_de_acervo:
         dados_do_pedido = json.loads(pedido.value)
-    print("dados do pedido: ", dados_do_pedido)
+    print("Lista de livros: ", dados_do_pedido)
     sleep(5)
 
 # painel_de_estoque.close()

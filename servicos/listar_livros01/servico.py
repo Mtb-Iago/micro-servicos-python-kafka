@@ -24,7 +24,6 @@ def listar_livros_acervo():
     with open(BANCO_ACERVO_LIVROS, "r") as livros_acervo:
         acervo = json.load(livros_acervo)
         livros = acervo["livros_acervo_biblioteca"]
-            
         livros_acervo.close()
     try:
         produtor = KafkaProducer(
@@ -35,7 +34,7 @@ def listar_livros_acervo():
     except KafkaError as erro:
         resultado = f"erro: {erro}"
     
-    return print(f"Lista de livros guardada")
+    return print(f"Lista inicial de livros guardada no Kafka")
 
 if __name__ == "__main__":
     iniciar()
