@@ -1,48 +1,27 @@
-#SERVICO 01 - LISTAR LIVROS 
-from flask_apscheduler import APScheduler
-from kafka import KafkaClient, KafkaProducer, KafkaConsumer, TopicPartition
-from kafka.errors import KafkaError
-
+from kafka import KafkaConsumer, TopicPartition
 from time import sleep
 import json
 
 PROCESSO = "listar_livros"
 
-def iniciar():
-    global deslocamento
-    deslocamento = 0
+painel_de_acervo = KafkaConsumer(
+    bootstrap_servers = ["kafka:29092"],
+    api_version = (0, 10, 1),
 
-    cliente = KafkaClient(
-        bootstrap_servers=["kafka:29092"], api_version=(0, 10, 1))
-    cliente.add_topic(PROCESSO)
-    cliente.close()
+    auto_offset_reset = "earliest",
+    consumer_timeout_ms=1000)
 
+particao = TopicPartition(PROCESSO, 0)
+painel_de_acervo.assign([particao])
 
-BANCO_ACERVO_LIVROS = "/workdir/acervo.json"
-def listar_livros_acervo():
-    
-    with open(BANCO_ACERVO_LIVROS, "r") as livros_acervo:
-        acervo = json.load(livros_acervo)
-        livros = acervo["livros_acervo_biblioteca"]
-        livros_acervo.close()
-    try:
-        produtor = KafkaProducer(
-            bootstrap_servers=["kafka:29092"], api_version=(0, 10, 1))
-        produtor.send(topic=PROCESSO, value=json.dumps(
-            livros).encode("utf-8"))
-        # print(livros)
-    except KafkaError as erro:
-        resultado = f"erro: {erro}"
-    
-    return print(f"Lista inicial de livros guardada no Kafka")
+painel_de_acervo.seek_to_beginning(particao)
+offset = 0
+while True:
+    print("Carregando lista de livros...")
 
-if __name__ == "__main__":
-    iniciar()
+    for pedido in painel_de_acervo:
+        dados_do_pedido = json.loads(pedido.value)
+    print("Lista de livros: ", dados_do_pedido)
+    sleep(5)
 
-    agendador = APScheduler()
-    agendador.add_job(id=PROCESSO, func=listar_livros_acervo,
-                    trigger="interval", seconds=3)
-    agendador.start()
-
-    while True:
-        sleep(60)
+# painel_de_estoque.close()

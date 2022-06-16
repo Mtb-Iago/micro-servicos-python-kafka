@@ -16,7 +16,6 @@ def iniciar():
         api_version=(0, 10, 1)
     )
     cliente.add_topic(PROCESSO)
-    cliente.add_topic(CONFIRMACAO_RESERVA)
     cliente.close()
 
 def executar():
@@ -37,16 +36,15 @@ def executar():
         print(informacoes_do_pedido)
         
         lista_atualizada = buscar_lista_livro(informacoes_do_pedido)
-        teste = lista_atualizada
         try:
             produtor = KafkaProducer(
                 bootstrap_servers=["kafka:29092"], api_version=(0, 10, 1))
             produtor.send(topic=PROCESSO, value=json.dumps(
-                teste).encode("utf-8"))
+                lista_atualizada).encode("utf-8"))
             # print(livros)
         except KafkaError as erro:
             resultado = f"erro: {erro}"
-        return print(teste)
+        return print(lista_atualizada)
 
 def buscar_lista_livro(informacao_reserva):
     PROCESSO = "listar_livros"
@@ -78,9 +76,9 @@ if __name__ == "__main__":
     iniciar()
     
     agendador = APScheduler()
-    agendador.add_job(id=CONFIRMACAO_RESERVA, func=executar,
-                        trigger="interval", seconds=3,  max_instances=3)
+    agendador.add_job(id=PROCESSO, func=executar,
+                        trigger="interval", seconds=3)
     agendador.start()
 
     while True:
-        sleep(0.8)
+        sleep(0.1)

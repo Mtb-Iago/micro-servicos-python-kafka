@@ -24,6 +24,17 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  iniciar_bd_estatico:
+    image: iniciar_bd_estatico
+    container_name: iniciar_bd_estatico
+    build: .
+    depends_on:
+      - kafka
+    hostname: "iniciar_bd_estatico"
+    volumes:
+      - "./servicos/iniciar_bd_estatico:/workdir"
+    command: python3 /workdir/servico.py
+
   listar_livros01:
     image: listar_livros01
     container_name: listar_livros01
