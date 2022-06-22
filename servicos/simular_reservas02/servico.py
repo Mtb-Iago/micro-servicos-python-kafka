@@ -1,13 +1,10 @@
 #SERVICO 02 - SIMULAR RESERVAS
-
-from ast import If
 from flask_apscheduler import APScheduler
 from flask import Flask, jsonify
 from kafka import KafkaClient, KafkaProducer, KafkaConsumer, TopicPartition
 from kafka.errors import KafkaError
 
 from time import sleep
-import random
 import json
 
 servico = Flask(__name__)
@@ -15,6 +12,7 @@ servico = Flask(__name__)
 PROCESSO = "listar_livros"
 CONFIRMACAO_RESERVA = "confirmar_reserva"
 SUGESTAO_LIVROS = "sugerir_livros"
+REQUISICAO = "requisicao"
 
 def iniciar():
     cliente = KafkaClient(
@@ -25,7 +23,19 @@ def iniciar():
 
 
 @servico.route("/escolherLivro/<int:id_livro>", methods=["POST", "GET"])
-def escolher_livro(id_livro):    
+def escolher_livro(id_livro):
+    
+    try:
+        produtor = KafkaProducer(
+            bootstrap_servers=["kafka:29092"],
+            api_version=(0, 10, 1)
+        )
+        produtor.send(topic=REQUISICAO, value=json.dumps(
+            id_livro).encode("utf-8"))
+        
+    except KafkaError as erro:
+        resultado = f"erro: {erro}"
+        
     consumir_livros = KafkaConsumer(
         bootstrap_servers = ["kafka:29092"],
         api_version = (0, 10, 1),
@@ -46,9 +56,7 @@ def escolher_livro(id_livro):
     retorno = efetuar_reserva(informacoes_da_remessa, id_livro)
     return retorno
 
-# Lista todos os livros do acervo
 def efetuar_reserva(informacoes_da_remessa, id_livro):
-    mensagem = "Processando"
     index = 0
     for acervo in informacoes_da_remessa:
         if acervo["id"] == id_livro:
@@ -89,12 +97,6 @@ def efetuar_reserva(informacoes_da_remessa, id_livro):
 if __name__ == "__main__":
     iniciar()
     
-    # agendador = APScheduler()
-    # agendador.add_job(id=PROCESSO, func=escolher_livro,
-    #                 trigger="interval", seconds=3)
-    # agendador.start()
-    # while True:
-    #     sleep(5)
 servico.run(
     host="0.0.0.0",
     debug=True

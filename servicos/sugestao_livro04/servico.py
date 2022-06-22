@@ -11,9 +11,6 @@ PROCESSO = "listar_livros"
 SUGESTAO_LIVROS = "sugerir_livros"
 
 def iniciar():
-    global deslocamento
-    deslocamento = 0
-
     cliente = KafkaClient(
         bootstrap_servers=["kafka:29092"],
         api_version=(0, 10, 1)
@@ -22,8 +19,6 @@ def iniciar():
     cliente.close()
 
 def executar():
-    global deslocamento
-
     consumidor_de_reserva = KafkaConsumer(
         bootstrap_servers=["kafka:29092"],
         api_version=(0, 10, 1),
@@ -34,14 +29,11 @@ def executar():
     consumidor_de_reserva.poll()
     consumidor_de_reserva.seek_to_end()
 
-    for message in consumidor_de_reserva:
-        print(message.timestamp)
-        print(message)
+    # for message in consumidor_de_reserva:
+    #     print(message.timestamp)
+    #     print(message)
 
-    #consumidor_de_reserva.close()
     for sugerir_livros_disponiveis in consumidor_de_reserva:
-        deslocamento = sugerir_livros_disponiveis.offset + 1
-
         comando_sugestao = sugerir_livros_disponiveis.value
         comando_sugestao = json.loads(comando_sugestao)
         

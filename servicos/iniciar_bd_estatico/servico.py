@@ -30,19 +30,11 @@ def listar_livros_acervo():
             bootstrap_servers=["kafka:29092"], api_version=(0, 10, 1))
         produtor.send(topic=PROCESSO, value=json.dumps(
             livros).encode("utf-8"))
-        # print(livros)
     except KafkaError as erro:
         resultado = f"erro: {erro}"
     
+    produtor.close()
     return print(f"Lista inicial de livros guardada no Kafka")
 
 if __name__ == "__main__":
-    iniciar()
-
-    agendador = APScheduler()
-    agendador.add_job(id=PROCESSO, func=listar_livros_acervo,
-                    trigger="interval", seconds=3)
-    agendador.start()
-
-    while True:
-        sleep(60)
+    listar_livros_acervo()

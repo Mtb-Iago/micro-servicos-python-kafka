@@ -13,7 +13,7 @@ painel_de_sugestao = KafkaConsumer(
 
 offset = 0
 while True:
-    print("Painel 03 para ativação da reserva")
+    #print("Painel 03 para ativação da reserva")
 
     particao = TopicPartition(CONFIRMACAO_RESERVA, 0)
     painel_de_sugestao.assign([particao])

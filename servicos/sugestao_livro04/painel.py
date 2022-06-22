@@ -12,23 +12,15 @@ painel_de_sugestao = KafkaConsumer(
     auto_offset_reset = "earliest",
     consumer_timeout_ms=1000)
 
-# particao = TopicPartition(SUGESTAO_LIVROS, 0)
-# painel_de_sugestao.assign([particao])
-
-# painel_de_sugestao.seek_to_beginning(particao)
 offset = 0
 while True:
-    print("Esperando Comando para sugestão de livros disponíveis...")
+    #print("Esperando Comando para sugestão de livros disponíveis...")
 
     particao = TopicPartition(SUGESTAO_LIVROS, 0)
     painel_de_sugestao.assign([particao])
     painel_de_sugestao.poll()
     painel_de_sugestao.seek_to_end()
 
-    #for message in painel_de_sugestao:
-        # print(message.timestamp)
-        # print(message)
-        
     for sugerir_livros_disponiveis in painel_de_sugestao:
         offset = sugerir_livros_disponiveis.offset + 1
 

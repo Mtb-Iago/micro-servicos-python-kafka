@@ -1,5 +1,4 @@
 from flask_apscheduler import APScheduler
-
 from kafka import KafkaClient, KafkaProducer, KafkaConsumer, TopicPartition
 from kafka.errors import KafkaError
 
@@ -52,7 +51,6 @@ def buscar_lista_livro(informacao_reserva):
     painel_de_acervo = KafkaConsumer(
         bootstrap_servers = ["kafka:29092"],
         api_version = (0, 10, 1),
-
         auto_offset_reset = "earliest",
         consumer_timeout_ms=1000)
 
@@ -81,4 +79,4 @@ if __name__ == "__main__":
     agendador.start()
 
     while True:
-        sleep(0.1)
+        sleep(0.3)
